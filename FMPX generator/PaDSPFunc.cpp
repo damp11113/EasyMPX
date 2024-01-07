@@ -1,4 +1,5 @@
 #include <vector>
+#include <cmath>
 
 struct AudioBuffer {
     float* data; // Audio data
@@ -10,7 +11,7 @@ struct Band {
     float threshold;
     float gain;
     float ratio;
-    float attackTime; // Attack time in milliseconds
+    float attackTime; // Attack time in millsiseconds
     float releaseTime; // Release time in milliseconds
     float currentGain; // Current gain level for dynamic changes
     float envelope; // Envelope for dynamic changes
@@ -94,6 +95,8 @@ struct Limiter {
     float currentGain; // Current gain level for dynamic changes
     float envelope; // Envelope for dynamic changes
 };
+
+
 
 void limiterProcess(float* buffer, int size, Limiter& limiter) {
     const float attackCoef = 1.0f - expf(-1.0f / (0.001f * limiter.attackTime * 44100.0f)); // Calculate attack coefficient

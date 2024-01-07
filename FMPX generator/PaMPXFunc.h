@@ -1,9 +1,10 @@
 #ifndef PAMPXFUNC_H
 #define PAMPXFUNC_H
 
-#include <vector>
+#include <cmath>
 
-std::vector<float> mixChannels(const std::vector<float>& leftChannel, const std::vector<float>& rightChannel);
-std::vector<float> subtractChannels(const std::vector<float>& leftChannel, const std::vector<float>& rightChannel);
+void generateSineWave(float* buffer, int frames, int sampleRate, float frequency, float amplitude = 0.5f);
+
+void mix(float* mixedBuffer, const float* buffers[], int numBuffers, int frames);
 
 #endif

@@ -1,40 +1,24 @@
-#include <vector>
-#include <iostream>
+#include <cmath>
 
-// Function to mix left and right channels (L + R)
-std::vector<float> mixChannels(const std::vector<float>& leftChannel, const std::vector<float>& rightChannel) {
-    // Ensure both channels have the same size
-    if (leftChannel.size() != rightChannel.size()) {
-        std::cerr << "Channels have different sizes. Mixing aborted." << std::endl;
-        return {};
+void generateSineWave(float* buffer, int frames, int sampleRate, float frequency, float amplitude = 0.5f) {
+    const float twoPi = 2.0f * 3.14159f;
+    float phaseIncrement = (frequency / sampleRate) * twoPi;
+    float phase = 0.0f;
+
+    for (int i = 0; i < frames; ++i) {
+        buffer[i] = amplitude * sin(phase);
+        phase += phaseIncrement;
+        if (phase > twoPi) {
+            phase -= twoPi;
+        }
     }
-
-    std::vector<float> mixedChannel;
-    mixedChannel.reserve(leftChannel.size()); // Reserve space for the mixed channel
-
-    // Perform mixing (L + R)
-    for (size_t i = 0; i < leftChannel.size(); ++i) {
-        mixedChannel.push_back(leftChannel[i] + rightChannel[i]);
-    }
-
-    return mixedChannel;
 }
 
-// Function to subtract left from right channel (L - R)
-std::vector<float> subtractChannels(const std::vector<float>& leftChannel, const std::vector<float>& rightChannel) {
-    // Ensure both channels have the same size
-    if (leftChannel.size() != rightChannel.size()) {
-        std::cerr << "Channels have different sizes. Subtraction aborted." << std::endl;
-        return {};
+void mix(float* mixedBuffer, const float* buffers[], int numBuffers, int frames) {
+    for (int i = 0; i < frames; ++i) {
+        mixedBuffer[i] = 0.0f; // Initialize mixed buffer with zeros
+        for (int j = 0; j < numBuffers; ++j) {
+            mixedBuffer[i] += buffers[j][i]; // Accumulate samples from each buffer
+        }
     }
-
-    std::vector<float> subtractedChannel;
-    subtractedChannel.reserve(leftChannel.size()); // Reserve space for the subtracted channel
-
-    // Perform subtraction (L - R)
-    for (size_t i = 0; i < leftChannel.size(); ++i) {
-        subtractedChannel.push_back(leftChannel[i] - rightChannel[i]);
-    }
-
-    return subtractedChannel;
 }

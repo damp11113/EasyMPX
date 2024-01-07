@@ -1,6 +1,7 @@
 #ifndef PADSPFUNC_H
 #define PADSPFUNC_H
 #include <vector>
+#include <cmath>
 
 void audioCompressor(float* audioBuffer, int bufferSize, float threshold, float ratio);
 

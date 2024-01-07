@@ -3,9 +3,10 @@
 #include "portaudio.h"
 #include "PaDSPFunc.h"
 #include "PaMPXFunc.h"
+#include "PaFilterFunc.h"
 
 #define INPUT_DEVICE_INDEX 16
-#define OUTPUT_DEVICE_INDEX 47
+#define OUTPUT_DEVICE_INDEX 39
 
 
 int main() {
@@ -83,6 +84,11 @@ int main() {
         {6910, -24.8, 0, 2, 1, 100}  // Example parameters for Band 3
         // Add more bands with their parameters
     };
+    float* piloToneBuffer = new float[framesPerBuffer];
+    float* stereoToneBuffer = new float[framesPerBuffer];
+    generateSineWave(piloToneBuffer, framesPerBuffer, 192000, 19000, 0.08f);
+    generateSineWave(stereoToneBuffer, framesPerBuffer, 192000, 38000, 1);
+
 
     while (true) {
         err = Pa_ReadStream(inputStream, buffer, framesPerBuffer);
@@ -91,12 +97,16 @@ int main() {
             break;
         }
 
-        AudioBuffer audio{ buffer, framesPerBuffer * inputParameters.channelCount };
-        multibandCompressor(audio, bands);
+        //AudioBuffer audio{ buffer, framesPerBuffer * inputParameters.channelCount };
+        //multibandCompressor(audio, bands);
 
         //limiterProcess(buffer, framesPerBuffer, limiter);
 
         // Normalize the output to prevent extreme volume fluctuations
+        
+        //LowPassFilter filter(192000, 15000, 64);
+
+        //filter.apply(buffer, framesPerBuffer);
         
         float maxSample = 1.0f;
         for (int i = 0; i < framesPerBuffer * inputParameters.channelCount; ++i) {
@@ -114,22 +124,36 @@ int main() {
         // Merge stereo channels into mono
         float* monoBuffer = new float[framesPerBuffer];
         float* subtractBuffer = new float[framesPerBuffer];
+        float* stereoMultipledBuffer = new float[framesPerBuffer];
+        float* mixedBuffer = new float[framesPerBuffer];
+        
         for (int i = 0, j = 0; i < framesPerBuffer * inputParameters.channelCount; i += 2, ++j) {
             monoBuffer[j] = 0.5f * (buffer[i] + buffer[i + 1]); // Average the two channels
         }
         for (int i = 0, j = 0; i < framesPerBuffer * inputParameters.channelCount; i += 2, ++j) {
             subtractBuffer[j] = 0.5f * (buffer[i] - buffer[i + 1]); // Average the two channels
         }
+        for (int i = 0; i < framesPerBuffer; ++i) {
+            stereoMultipledBuffer[i] = stereoToneBuffer[i] * subtractBuffer[i];
+        }
+
         
+        const float* mixbuffers[3] = {monoBuffer, piloToneBuffer, stereoMultipledBuffer };
+
+   
+
+        mix(mixedBuffer, mixbuffers, 3, framesPerBuffer);
 
 
-        err = Pa_WriteStream(outputStream, subtractBuffer, framesPerBuffer);
+        err = Pa_WriteStream(outputStream, mixedBuffer, framesPerBuffer);
         if (err != paNoError) {
             std::cout << "PortAudio output stream error: " << Pa_GetErrorText(err) << std::endl;
             break;
         }
         delete[] monoBuffer;
         delete[] subtractBuffer;
+        delete[] mixedBuffer;
+        delete[] stereoMultipledBuffer;
 
     }
 

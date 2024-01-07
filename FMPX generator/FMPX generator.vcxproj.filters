@@ -24,6 +24,9 @@
     <ClCompile Include="PaMPXFunc.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PaFilterFunc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -39,6 +42,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PaMPXFunc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PaFilterFunc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
