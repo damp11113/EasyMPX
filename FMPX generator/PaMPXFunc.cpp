@@ -1,16 +1,18 @@
+#include "PaMPXFunc.h"
 #include <cmath>
+#include <vector>
 
-void generateSineWave(float* buffer, int frames, int sampleRate, float frequency, float amplitude = 0.5f) {
-    const float twoPi = 2.0f * 3.14159f;
-    float phaseIncrement = (frequency / sampleRate) * twoPi;
-    float phase = 0.0f;
+void SignalGenerator::GenerateSineWave(float* buffer, unsigned long frames, float frequency, float amplitude, int samplerate) {
+    const double phaseIncrement = frequency / samplerate;
+    const double cycles = frames / samplerate; // Number of cycles in the buffer
+    double phase = 0.0;
 
-    for (int i = 0; i < frames; ++i) {
-        buffer[i] = amplitude * sin(phase);
+    for (unsigned long i = 0; i < frames; ++i) {
+        buffer[i] = amplitude * sin(2.0 * M_PI * phase);
+
         phase += phaseIncrement;
-        if (phase > twoPi) {
-            phase -= twoPi;
-        }
+
+
     }
 }
 

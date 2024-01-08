@@ -76,7 +76,7 @@ int main() {
         return -1;
     }
 
-    const int framesPerBuffer = 4096;
+    const int framesPerBuffer = 19200;
     float* buffer = new float[framesPerBuffer * inputParameters.channelCount];
     std::vector<Band> bands = {
         {137, -20.2, 1, 3, 1, 100},  // Example parameters for Band 1
@@ -86,8 +86,9 @@ int main() {
     };
     float* piloToneBuffer = new float[framesPerBuffer];
     float* stereoToneBuffer = new float[framesPerBuffer];
-    generateSineWave(piloToneBuffer, framesPerBuffer, 192000, 19000, 0.08f);
-    generateSineWave(stereoToneBuffer, framesPerBuffer, 192000, 38000, 1);
+    SignalGenerator::GenerateSineWave(piloToneBuffer, framesPerBuffer, 19000, 0.08f);
+    SignalGenerator::GenerateSineWave(stereoToneBuffer, framesPerBuffer, 38000, 1);
+    
 
 
     while (true) {
