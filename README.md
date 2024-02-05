@@ -1,6 +1,5 @@
 # EasyMPX
 [![Windows](https://badgen.net/badge/icon/windows?icon=windows&label)](https://microsoft.com/windows/)
-[![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](http://perso.crans.org/besson/LICENSE.html)
 
 A Stereo encoder for FM transmitters now with RDS and SCA support. (This software work only with windows)
 
