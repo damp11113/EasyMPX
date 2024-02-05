@@ -1,7 +1,7 @@
 # EasyMPX
 [![Windows](https://badgen.net/badge/icon/windows?icon=windows&label)](https://microsoft.com/windows/)
 
-A Stereo encoder for FM transmitters now with RDS and SCA support. (This software work only with windows)
+A Stereo encoder for FM transmitters now with RDS and SCA support.
 
 !! Warning !! If you use this software please use with audio processor like stereo tool or hellfire processor. This software haven't composite clipper or composite limiter for protect.
 
