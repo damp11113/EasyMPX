@@ -1,7 +1,7 @@
 # EasyMPX
-!! Warning !! If you use this software please use with audio processor like stereo tool or hellfire processor. This software haven't composite clipper or composite limiter for protect.
+A Stereo encoder for FM transmitters now with RDS and SCA support. (This software work only with windows)
 
-A Stereo encoder for FM transmitters now with RDS and SCA support.
+!! Warning !! If you use this software please use with audio processor like stereo tool or hellfire processor. This software haven't composite clipper or composite limiter for protect.
 
 ![image](https://github.com/damp11113/FM-MPX-Processor/assets/64675096/f4fe9d1e-4908-4ddb-9038-80327d59091a)
 
