@@ -131,6 +131,7 @@
     <ClCompile Include="PaDSPFunc.cpp" />
     <ClCompile Include="PaFilterFunc.cpp" />
     <ClCompile Include="PaMPXFunc.cpp" />
+    <ClCompile Include="rtfir.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\..\..\..\radioconda\pkgs\portaudio-19.6.0-h63175ca_9\Library\bin\portaudio.dll" />
@@ -141,6 +142,7 @@
     <ClInclude Include="PaDSPFunc.h" />
     <ClInclude Include="PaFilterFunc.h" />
     <ClInclude Include="PaMPXFunc.h" />
+    <ClInclude Include="rtfir.hpp" />
   </ItemGroup>
   <ItemGroup>
     <Library Include="..\..\..\..\radioconda\pkgs\portaudio-19.6.0-h63175ca_9\Library\lib\portaudio.lib" />

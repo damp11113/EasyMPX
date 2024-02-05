@@ -4,10 +4,13 @@
 #include "PaDSPFunc.h"
 #include "PaMPXFunc.h"
 #include "PaFilterFunc.h"
+#include "rtfir.hpp"
 
-#define INPUT_DEVICE_INDEX 16
+
+#define INPUT_DEVICE_INDEX 4
 #define OUTPUT_DEVICE_INDEX 39
 
+#define CompositeClipper true;
 
 int main() {
     PaError err;
@@ -86,9 +89,11 @@ int main() {
     };
     float* piloToneBuffer = new float[framesPerBuffer];
     float* stereoToneBuffer = new float[framesPerBuffer];
+
     SignalGenerator::GenerateSineWave(piloToneBuffer, framesPerBuffer, 19000, 0.08f);
     SignalGenerator::GenerateSineWave(stereoToneBuffer, framesPerBuffer, 38000, 1);
-    
+
+
     std::cout << "MPX encoder is running" << std::endl;
 
     while (true) {
@@ -102,9 +107,6 @@ int main() {
         //AudioBuffer audio{ buffer, framesPerBuffer * inputParameters.channelCount };
         //multibandCompressor(audio, bands);
 
-        //LowPassFilter filter(192000, 15000, 64);
-
-        //filter.apply(buffer, framesPerBuffer);
 
 
         // MPX Processing here
@@ -119,10 +121,27 @@ int main() {
         for (int i = 0, j = 0; i < framesPerBuffer * inputParameters.channelCount; i += 2, ++j) {
             subtractBuffer[j] = 0.5f * (buffer[i] - buffer[i + 1]); // Average the two channels
         }
+
+        // limit mono signal
+        /*
+        float maxSample2 = 2.5f;
+        for (int i = 0; i < framesPerBuffer; ++i) {
+            if (fabsf(subtractBuffer[i]) > maxSample2) {
+                maxSample2 = fabsf(subtractBuffer[i]);
+            }
+        }
+
+        if (maxSample2 > 1.0f) {
+            for (int i = 0; i < framesPerBuffer; ++i) {
+                subtractBuffer[i] /= maxSample2;
+            }
+        }
+        */
         for (int i = 0; i < framesPerBuffer; ++i) {
             stereoMultipledBuffer[i] = stereoToneBuffer[i] * subtractBuffer[i];
         }
         // limit mono signal
+        /*
         float maxSample = 2.0f;
         for (int i = 0; i < framesPerBuffer; ++i) {
             if (fabsf(monoBuffer[i]) > maxSample) {
@@ -135,27 +154,26 @@ int main() {
                 monoBuffer[i] /= maxSample;
             }
         }
-        // limit mono signal
-        float maxSample2 = 2.5f;
-        for (int i = 0; i < framesPerBuffer; ++i) {
-            if (fabsf(stereoMultipledBuffer[i]) > maxSample2) {
-                maxSample2 = fabsf(stereoMultipledBuffer[i]);
-            }
-        }
-
-        if (maxSample2 > 1.0f) {
-            for (int i = 0; i < framesPerBuffer; ++i) {
-                stereoMultipledBuffer[i] /= maxSample2;
-            }
-        }
-
-
+        */
 
         // mix mpx
         const float* mixbuffers[3] = {monoBuffer, piloToneBuffer, stereoMultipledBuffer };
         mix(mixedBuffer, mixbuffers, 3, framesPerBuffer);
 
-        
+        if (CompositeClipper) {
+            float maxSample = 2.0f;
+            for (int i = 0; i < framesPerBuffer; ++i) {
+                if (fabsf(mixedBuffer[i]) > maxSample) {
+                    maxSample = fabsf(mixedBuffer[i]);
+                }
+            }
+
+            if (maxSample > 1.0f) {
+                for (int i = 0; i < framesPerBuffer; ++i) {
+                    mixedBuffer[i] /= maxSample;
+                }
+            }
+        }
 
 
         err = Pa_WriteStream(outputStream, mixedBuffer, framesPerBuffer);
@@ -167,7 +185,7 @@ int main() {
         delete[] subtractBuffer;
         delete[] mixedBuffer;
         delete[] stereoMultipledBuffer;
-
+        //delete[] lowpassed15KBuffer;
     }
 
     delete[] buffer;
