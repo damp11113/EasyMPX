@@ -1,0 +1,64 @@
+name: Build
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  windows:
+    name: Windows x64 (static)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install MinGW-w64
+        run: sudo apt-get update && sudo apt-get install -y mingw-w64 cmake
+
+      - name: Build PortAudio (static)
+        run: |
+          cat > mingw.cmake <<'TOOLCHAIN'
+          set(CMAKE_SYSTEM_NAME Windows)
+          set(CMAKE_C_COMPILER x86_64-w64-mingw32-gcc-posix)
+          set(CMAKE_CXX_COMPILER x86_64-w64-mingw32-g++-posix)
+          set(CMAKE_RC_COMPILER x86_64-w64-mingw32-windres)
+          TOOLCHAIN
+          git clone --depth 1 --branch v19.7.0 https://github.com/PortAudio/portaudio.git pa
+          cmake -S pa -B pa-build -DCMAKE_TOOLCHAIN_FILE=$PWD/mingw.cmake -DCMAKE_BUILD_TYPE=Release \
+            -DPA_BUILD_SHARED_LIBS=OFF -DPA_USE_ASIO=OFF -DPA_USE_WMME=ON -DPA_USE_DS=ON \
+            -DPA_USE_WASAPI=ON -DPA_USE_WDMKS=ON -DCMAKE_INSTALL_PREFIX=$PWD/pa-win
+          cmake --build pa-build -j4
+          cmake --install pa-build
+
+      - name: Build FMPXgen.exe
+        run: |
+          mkdir -p dist
+          cd "FMPX generator"
+          x86_64-w64-mingw32-g++-posix -std=c++14 -O2 -Wall -static -static-libgcc -static-libstdc++ \
+            -I../pa-win/include \
+            "FMPX generator.cpp" MPXEncoder.cpp RDSEncoder.cpp Resampler.cpp WavFile.cpp \
+            -o ../dist/FMPXgen.exe ../pa-win/lib/libportaudio.a \
+            -lwinmm -lole32 -luuid -lsetupapi -lksuser -lavrt
+          cp ../README.md ../LICENSE.txt ../dist/
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: EasyMPX-windows-x64
+          path: dist/
+
+  linux:
+    name: Linux
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y portaudio19-dev cmake pkg-config
+      - name: Build
+        run: |
+          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+          cmake --build build -j4
+      - name: Smoke test (file to file with RDS)
+        run: |
+          python3 -c "import wave,struct,math; w=wave.open('t.wav','wb'); w.setnchannels(2); w.setsampwidth(2); w.setframerate(48000); w.writeframes(b''.join(struct.pack('<hh',int(16000*math.sin(2*math.pi*1000*i/48000)),0) for i in range(48000)))"
+          ./build/FMPXgen --input t.wav --output mpx.wav --rds --ps TEST
+          test "$(stat -c %s mpx.wav)" -eq $((80 + 192000 * 4))

@@ -128,6 +128,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="FMPX generator.cpp" />
+    <ClCompile Include="MPXEncoder.cpp" />
+    <ClCompile Include="RDSEncoder.cpp" />
+    <ClCompile Include="Resampler.cpp" />
+    <ClCompile Include="WavFile.cpp" />
     <ClCompile Include="PaDSPFunc.cpp" />
     <ClCompile Include="PaFilterFunc.cpp" />
     <ClCompile Include="PaMPXFunc.cpp" />
@@ -139,7 +143,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\radioconda\pkgs\portaudio-19.6.0-h63175ca_9\Library\include\portaudio.h" />
+    <ClInclude Include="MPXEncoder.h" />
     <ClInclude Include="PaDSPFunc.h" />
+    <ClInclude Include="RDSEncoder.h" />
+    <ClInclude Include="Resampler.h" />
+    <ClInclude Include="RingBuffer.h" />
+    <ClInclude Include="WavFile.h" />
     <ClInclude Include="PaFilterFunc.h" />
     <ClInclude Include="PaMPXFunc.h" />
     <ClInclude Include="rtfir.hpp" />
